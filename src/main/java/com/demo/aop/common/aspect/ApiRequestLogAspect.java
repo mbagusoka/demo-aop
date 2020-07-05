@@ -5,7 +5,6 @@ import com.demo.aop.model.entity.ApiRequestLog;
 import com.demo.aop.model.enums.ApiRequestLogStatus;
 import com.demo.aop.repository.ApiRequestLogRepository;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.AfterThrowing;
 import org.aspectj.lang.annotation.Aspect;
@@ -22,10 +21,9 @@ public class ApiRequestLogAspect {
      * If we want to use JoinPoint, it must be on first argument.
      * If not the advice will error and the application cannot be started.
      */
-    @AfterReturning(value = "@annotation(apiRequestLogger)")
-    public void logSuccess(JoinPoint joinPoint, ApiRequestLogger apiRequestLogger) {
+    @AfterReturning(value = "@annotation(apiRequestLogger) && args(payload)")
+    public void logSuccess(ApiRequestLogger apiRequestLogger, String payload) {
         String url = apiRequestLogger.url();
-        String payload = (String) joinPoint.getArgs()[0];
         ApiRequestLog requestLog = new ApiRequestLog(url, payload, ApiRequestLogStatus.SUCCESS, "");
         requestLogRepository.save(requestLog);
     }
